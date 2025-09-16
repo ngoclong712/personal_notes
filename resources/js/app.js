@@ -1,10 +1,7 @@
-import './bootstrap';
 import { createApp } from 'vue';
+import App from './App.vue';
+import router from "@/router/index.js";
 
-import ExampleComponent from "@/components/ExampleComponent.vue";
+import '../css/app.css';
 
-const app = createApp({})
-
-app.component(ExampleComponent.name, ExampleComponent);
-
-app.mount('#app')
+createApp(App).use(router).mount('#app')
