@@ -11,9 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('notes', function (Blueprint $table) {
+        Schema::create('note_attachments', function (Blueprint $table) {
             $table->id();
-            
+            $table->foreignId('note_id')->constrained();
+            $table->string('file_path');
+            $table->string('file_type');
             $table->timestamps();
         });
     }
@@ -23,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('notes');
+        Schema::dropIfExists('note_attachments');
     }
 };
