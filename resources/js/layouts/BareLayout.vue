@@ -16,10 +16,14 @@
         <footer class="border-t border-gray-200 dark:border-gray-800 px-4 py-3 text-sm text-gray-500 dark:text-gray-400">
             <div class="max-w-6xl mx-auto">© {{ new Date().getFullYear() }} Personal Notes</div>
         </footer>
+
+        <!-- Toasts -->
+        <ToastHost />
     </div>
 </template>
 
 <script setup lang="ts">
+import ToastHost from '@/components/ToastHost.vue'
 </script>
 
 

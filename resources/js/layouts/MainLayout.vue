@@ -15,6 +15,9 @@
 
         <!-- Footer -->
         <Footer />
+
+        <!-- Toasts -->
+        <ToastHost />
     </div>
 </template>
 
@@ -22,4 +25,5 @@
 import Header from '@/components/layout/Header.vue'
 import Sidebar from '@/components/layout/Sidebar.vue'
 import Footer from '@/components/layout/Footer.vue'
+import ToastHost from '@/components/ToastHost.vue'
 </script>
