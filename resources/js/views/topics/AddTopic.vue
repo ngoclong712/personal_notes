@@ -26,6 +26,8 @@
 <script setup lang="ts">
 import { reactive } from 'vue'
 import { useRouter, RouterLink } from 'vue-router'
+import axios from 'axios'
+import { useToast } from '@/lib/toast'
 
 const router = useRouter()
 
@@ -33,10 +35,11 @@ const form = reactive({
     name: '',
     description: '' as string | null,
 })
+const { success } = useToast()
 
 async function submit() {
-    // Placeholder: later POST to backend then navigate
-    // await axios.post('/api/topics', form)
+    await axios.post('/api/topics', form)
+    success('Topic created')
     router.push({ name: 'topic' })
 }
 </script>

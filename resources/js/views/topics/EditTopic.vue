@@ -26,10 +26,12 @@
 import { onMounted, reactive } from 'vue'
 import { useRoute, useRouter, RouterLink } from 'vue-router'
 import axios from 'axios'
+import { useToast } from '@/lib/toast'
 
 const route = useRoute()
 const router = useRouter()
 const id = route.params.id as string
+const { success } = useToast()
 
 const form = reactive({
     name: '',
@@ -37,18 +39,15 @@ const form = reactive({
 })
 
 onMounted(async () => {
-    const res = await axios.get(`/api/topics`)
-    const items: Array<{ id: number; name: string; description: string | null }> = res.data
-    const current = items.find(t => String(t.id) === String(id))
-    if (current) {
-        form.name = current.name
-        form.description = current.description
-    }
+    const res = await axios.get(`/api/topics/${id}`)
+    const current: { id: number; name: string; description: string | null } = res.data.data
+    form.name = current.name
+    form.description = current.description
 })
 
 async function submit() {
-    // Placeholder for PUT /api/topics/:id
-    // await axios.put(`/api/topics/${id}`, form)
+    await axios.put(`/api/topics/${id}`, form)
+    success('Topic updated')
     router.push({ name: 'topic.detail', params: { id } })
 }
 </script>

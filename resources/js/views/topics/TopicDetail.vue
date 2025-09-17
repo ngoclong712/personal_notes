@@ -34,9 +34,8 @@ const topic = ref<Topic | null>(null)
 onMounted(async () => {
     try {
         const id = route.params.id
-        const res = await axios.get(`/api/topics`)
-        const items: Topic[] = res.data
-        topic.value = items.find(t => String(t.id) === String(id)) ?? null
+        const res = await axios.get(`/api/topics/${id}`)
+        topic.value = res.data.data
     } finally {
         loading.value = false
     }
