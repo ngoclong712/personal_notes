@@ -26,10 +26,12 @@ class StoreRequest extends FormRequest
                 'string',
                 'required',
                 'unique:topics,name',
+                'max:256',
             ],
             'description' => [
                 'string',
                 'nullable',
+                'max:256',
             ]
         ];
     }

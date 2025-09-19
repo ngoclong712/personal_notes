@@ -26,11 +26,13 @@ class UpdateRequest extends FormRequest
             'name' => [
                 'required',
                 'string',
-                Rule::unique('topics', 'name')->ignore($this->route('topic')?->id)
+                Rule::unique('topics', 'name')->ignore($this->route('topic')?->id),
+                'max:256',
             ],
             'description' => [
                 'nullable',
                 'string',
+                'max:256',
             ]
         ];
     }
