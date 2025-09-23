@@ -4,7 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\Topic\StoreRequest;
 use App\Http\Requests\Topic\UpdateRequest;
+use App\Imports\TopicsImport;
 use App\Models\Topic;
+use Maatwebsite\Excel\Facades\Excel;
 
 class TopicController extends Controller
 {
@@ -40,5 +42,22 @@ class TopicController extends Controller
     {
         $topic->delete();
         return $this->successResponse([], 'Deleted');
+    }
+
+    public function import()
+    {
+        try {
+            $import = new TopicsImport();
+            \Maatwebsite\Excel\Facades\Excel::import($import, request()->file('file'));
+
+            return response()->json([
+                'message' => 'Đọc file thành công',
+                'data' => $import->getData()
+            ]);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'message' => $th->getMessage()
+            ], 500);
+        }
     }
 }
