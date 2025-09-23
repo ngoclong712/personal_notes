@@ -8,6 +8,7 @@ import Topic from "@/views/Topic.vue";
 import AddTopic from "@/views/topics/AddTopic.vue";
 import TopicDetail from "@/views/topics/TopicDetail.vue";
 import EditTopic from "@/views/topics/EditTopic.vue";
+import Test from "@/views/Test.vue";
 
 const routes = [
     {
@@ -33,6 +34,11 @@ const routes = [
                 path: 'deadline',
                 name: 'deadline',
                 component: Deadline
+            },
+            {
+                path: 'test',
+                name: 'test',
+                component: Test
             }
         ]
     },
