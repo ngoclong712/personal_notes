@@ -169,7 +169,7 @@ async function deleteNote(id) {
                 </select>
             </div>
             <div class=" flex gap-2 order-2 md:order-none md:ml-0">
-                <RouterLink to="/note/add" class="px-3 py-2 rounded-lg bg-blue-600 text-white hover:opacity-90">Add</RouterLink>
+                <RouterLink :to="{ name: 'note.add' }" class="px-3 py-2 rounded-lg bg-blue-600 text-white hover:opacity-90">Add</RouterLink>
                 <button @click="showImportModal = true" class="px-3 py-2 rounded-lg bg-green-600 text-white hover:opacity-90">Import CSV</button>
             </div>
         </div>
