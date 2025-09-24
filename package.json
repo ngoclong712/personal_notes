@@ -16,8 +16,10 @@
     },
     "dependencies": {
         "@vitejs/plugin-vue": "^6.0.1",
+        "@vueup/vue-quill": "^1.2.0",
         "lucide-vue-next": "^0.544.0",
         "vue": "^3.5.21",
+        "vue-multiselect": "^3.3.1",
         "vue-router": "^4.5.1"
     }
 }
