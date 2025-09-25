@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\Note\StoreRequest;
 use App\Models\Note;
 use Illuminate\Http\Request;
 
@@ -16,5 +17,10 @@ class NoteController extends Controller
             ->get(['id','title','status','updated_at','topic_id']);
 
         return $this->successResponse($notes);
+    }
+
+    public function store(StoreRequest $request) {
+        $note = Note::create($request->validated());
+        return $this->successResponse($note);
     }
 }

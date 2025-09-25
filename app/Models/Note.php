@@ -10,4 +10,11 @@ class Note extends Model
     {
         return $this->belongsTo(Topic::class);
     }
+
+    protected $fillable = [
+        'title',
+        'content',
+        'topic_id',
+        'status',
+    ];
 }

@@ -17,15 +17,21 @@ const topics = ref([])
 const form = reactive({
     title: '',
     status: 1,
-    topic_id: null,
+    topic: null,
     content: '',
 })
 
 const { success } = useToast()
 
 async function submit() {
-    await axios.post('/api/notes', form)
-    success('Topic created')
+    const payload = {
+        title: form.title,
+        status: form.status,
+        content: form.content,
+        topic_id: form.topic?.id ?? null, // 👈 map object sang id
+    }
+    await axios.post('/api/notes', payload)
+    success('Note created')
     router.push({ name: 'note' })
 }
 
@@ -69,7 +75,7 @@ onMounted(async () => {
             <div class="col-span-2">
                 <label class="block text-sm font-medium text-gray-700 mb-1">Topic</label>
                 <Multiselect
-                    v-model="form.topic_id"
+                    v-model="form.topic"
                     :options="topics"
                     label="name"
                     track-by="id"
@@ -88,7 +94,7 @@ onMounted(async () => {
                 />
             </div>
             <div class="mt-15">
-                <Button class="bg-blue-500 text-white rounded-lg px-4 py-2 hover:cursor-pointer">Add</Button>
+                <button class="bg-blue-500 text-white rounded-lg px-4 py-2 hover:cursor-pointer">Add</button>
             </div>
         </form>
     </div>
