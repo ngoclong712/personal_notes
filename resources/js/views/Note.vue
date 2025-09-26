@@ -246,6 +246,9 @@ async function deleteNote(id) {
                             <button @click="deleteNote(n.id)" class="px-3 py-1.5 rounded-lg bg-red-600 text-white hover:opacity-80 hover:cursor-pointer">Delete</button>
                         </td>
                     </tr>
+                    <tr v-if="sortedNotes.length === 0">
+                        <td colspan="4" class="w-full px-4 py-6 text-center text-sm text-gray-500 dark:text-gray-400">No notes found.</td>
+                    </tr>
                 </tbody>
             </table>
         </div>

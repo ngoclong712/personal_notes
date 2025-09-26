@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('title');
             $table->longText('content');
-            $table->foreignId('topic_id')->constrained();
+            $table->foreignId('topic_id')->nullable()->constrained();
             $table->integer('status')->default(1);
             $table->timestamps();
         });

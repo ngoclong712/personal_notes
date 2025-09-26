@@ -93,7 +93,7 @@ onMounted(async () => {
                 />
             </div>
             <div class="mt-15">
-                <button class="bg-blue-500 text-white rounded-lg px-4 py-2 hover:cursor-pointer">Edit</button>
+                <button class="bg-blue-500 text-white rounded-lg px-4 py-2 hover:cursor-pointer">Add</button>
             </div>
         </form>
     </div>
