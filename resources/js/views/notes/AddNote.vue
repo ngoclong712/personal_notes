@@ -7,7 +7,6 @@ import Multiselect from 'vue-multiselect'
 
 import { QuillEditor } from '@vueup/vue-quill'
 import '@vueup/vue-quill/dist/vue-quill.snow.css';
-
 import 'vue-multiselect/dist/vue-multiselect.css'
 
 const router = useRouter()
@@ -94,7 +93,7 @@ onMounted(async () => {
                 />
             </div>
             <div class="mt-15">
-                <button class="bg-blue-500 text-white rounded-lg px-4 py-2 hover:cursor-pointer">Add</button>
+                <button class="bg-blue-500 text-white rounded-lg px-4 py-2 hover:cursor-pointer">Edit</button>
             </div>
         </form>
     </div>
