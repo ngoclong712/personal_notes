@@ -57,7 +57,7 @@
                         <td class="px-4 py-3 text-sm text-right">
                             <div class="inline-flex gap-2">
                                 <RouterLink :to="{ name: 'topic.edit', params: { id: topic.id } }" class="px-2 py-1 rounded bg-green-600 hover:bg-green-700 text-white">Edit</RouterLink>
-                                <button @click="onDelete(topic.id)" class="px-2 py-1 rounded bg-red-600 hover:bg-red-700 text-white">Delete</button>
+                                <button @click="onDelete(topic.id)" class="px-2 py-1 rounded bg-red-600 hover:bg-red-700 text-white hover:cursor-pointer">Delete</button>
                             </div>
                         </td>
                     </tr>

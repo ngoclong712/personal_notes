@@ -1,10 +1,12 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import axios from 'axios'
+import { useToast } from '@/lib/toast'
 
 // Data from API
 const notes = ref([])
 const loading = ref(false)
+const { success } = useToast()
 
 // Filters
 const search = ref('')
@@ -61,7 +63,7 @@ async function reloadNotes() {
     notes.value = rows.map(r => ({
         id: r.id,
         title: r.title,
-        topic: r.topic?.name ?? '',
+        topic: r.topic?.name ?? 'Null',
         status: r.status, // numeric enum
         updatedAt: r.updated_at ? new Date(r.updated_at).toISOString().slice(0, 10) : ''
     }))
@@ -143,6 +145,7 @@ async function deleteNote(id) {
     try {
         await axios.delete(`/api/notes/${id}`)
         await reloadNotes()
+        success('Note Deleted')
     } catch (e) {
         console.error(e)
     }
@@ -227,7 +230,9 @@ async function deleteNote(id) {
                 <tbody class="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-800">
                     <tr v-for="n in sortedNotes" :key="n.id" class="hover:bg-gray-50 dark:hover:bg-gray-800/50">
                         <td class="px-4 py-2 text-sm text-gray-700 dark:text-gray-200">{{ n.id }}</td>
-                        <td class="px-4 py-2 text-sm">{{ n.title }}</td>
+                        <td class="px-4 py-3 text-sm text-blue-600 dark:text-blue-400">
+                            <RouterLink :to="{ name: 'note.detail', params: {id: n.id }}" class="hover:underline">{{ n.title }}</RouterLink>
+                        </td>
                         <td class="px-4 py-2 text-sm">{{ n.topic }}</td>
                         <td class="px-4 py-2 text-sm">
                              <span :class="[
@@ -238,7 +243,7 @@ async function deleteNote(id) {
                         <td class="px-4 py-2 text-sm">{{ n.updatedAt }}</td>
                         <td class="px-4 py-2 text-sm text-right">
                             <RouterLink :to="`/note/${n.id}/edit`" class="px-3 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-800 mr-2">Edit</RouterLink>
-                            <button @click="deleteNote(n.id)" class="px-3 py-1.5 rounded-lg bg-red-600 text-white hover:opacity-90">Delete</button>
+                            <button @click="deleteNote(n.id)" class="px-3 py-1.5 rounded-lg bg-red-600 text-white hover:opacity-80 hover:cursor-pointer">Delete</button>
                         </td>
                     </tr>
                 </tbody>
