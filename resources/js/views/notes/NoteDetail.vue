@@ -10,6 +10,13 @@ type Topic = {
     name: string,
 }
 
+type Attachment = {
+    id: number,
+    note_id: number,
+    file_path: string,
+    file_type: string,
+    file_name: string,
+}
 type Note = {
     id: number,
     title: string,
@@ -17,6 +24,7 @@ type Note = {
     topic_id: number | null,
     topic?: Topic,  // 👈 thêm field này để nhận object topic từ API
     status: number,
+    attachments?: Attachment[],
 }
 
 const note = ref<Note>()
@@ -69,6 +77,35 @@ onMounted(async () => {
                 <div class="col-span-2">
                     <span class="font-medium">Content:</span>
                     <div class="prose max-w-none dark:prose-invert mt-2" v-html="note.content"></div>
+                </div>
+                <div class="col-span-2 mt-4">
+                    <span class="font-medium">Attachments:</span>
+                    <div v-if="note.attachments?.length" class="mt-2 space-y-2">
+                        <div
+                            v-for="file in note.attachments"
+                            :key="file.id"
+                            class="flex items-center justify-between px-3 py-2 border rounded-md bg-gray-50"
+                        >
+                            <div class="flex items-center space-x-2">
+                                <a
+                                    :href="file.file_path"
+                                    target="_blank"
+                                    class="text-blue-600 underline hover:text-blue-800"
+                                >
+                                    {{ file.file_name ?? file.file_path.split('/').pop() }}
+                                </a>
+                                <span class="text-xs text-gray-500">({{ file.file_type.toUpperCase() }})</span>
+                            </div>
+                            <a
+                                :href="file.file_path"
+                                download
+                                class="text-sm text-green-600 hover:underline"
+                            >
+                                Download
+                            </a>
+                        </div>
+                    </div>
+                    <div v-else class="text-gray-500">No attachments</div>
                 </div>
             </div>
         </div>
