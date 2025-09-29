@@ -11,6 +11,11 @@ class Note extends Model
         return $this->belongsTo(Topic::class);
     }
 
+    public function attachments()
+    {
+        return $this->hasMany(NoteAttachment::class);
+    }
+
     protected $fillable = [
         'title',
         'content',
