@@ -42,6 +42,14 @@ class StoreRequest extends FormRequest
             'status' => [
                 'required',
                 Rule::in(NoteStatusEnum::getValues()),
+            ],
+            'attachments' => [
+                'nullable',
+                'array',
+            ],
+            'attachments.*' => [
+                'file',
+                'mimes:pdf,doc,docx,xls,xlsx,txt',
             ]
         ];
     }

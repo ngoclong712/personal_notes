@@ -42,7 +42,20 @@ class UpdateRequest extends FormRequest
                 'required',
                 'integer',
                 Rule::in(NoteStatusEnum::getValues()),
-            ]
+            ],
+            'attachments.*' => [
+                'file',
+                'mimes:pdf,doc,docx,xls,xlsx,txt',
+                'max:5120', // 5MB
+            ],
+            'deleted_ids' => [
+                'nullable',
+                'array',
+            ],
+            'deleted_ids.*' => [
+                'integer',
+                Rule::exists('note_attachments', 'id'),
+            ],
         ];
     }
 }
