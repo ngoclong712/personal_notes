@@ -48,7 +48,7 @@ class TopicController extends Controller
     {
         try {
             $import = new TopicsImport();
-            \Maatwebsite\Excel\Facades\Excel::import($import, request()->file('file'));
+            Excel::import($import, request()->file('file'));
 
             return response()->json([
                 'message' => 'Đọc file thành công',

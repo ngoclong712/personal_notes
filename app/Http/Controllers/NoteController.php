@@ -4,11 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\Note\StoreRequest;
 use App\Http\Requests\Note\UpdateRequest;
+use App\Imports\NotesImport;
 use App\Models\Note;
-use App\Models\NoteAttachment;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use Maatwebsite\Excel\Facades\Excel;
 
 class NoteController extends Controller
 {
@@ -118,6 +118,23 @@ class NoteController extends Controller
             return $this->successResponse([], 'Note and attachments deleted successfully');
         } catch (\Exception $e) {
             return $this->errorResponse('Failed to delete note', 500, $e->getMessage());
+        }
+    }
+
+    public function import()
+    {
+        try {
+            $import = new NotesImport();
+            Excel::import($import, request()->file('file'));
+
+            return response()->json([
+                'message' => 'Đọc file thành công',
+                'data' => $import->getData()
+            ]);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'message' => $th->getMessage()
+            ], 500);
         }
     }
 }

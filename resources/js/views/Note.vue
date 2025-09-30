@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 import axios from 'axios'
 import { useToast } from '@/lib/toast'
@@ -77,7 +77,7 @@ const importing = ref(false)
 const selectedFile = ref(null)
 const selectedFileName = ref('')
 const fileInputRef = ref(null)
-const importResult = ref(null)
+const importResult = ref<{ created: number; updated: number; skipped: number; errors?: string[] } | null>(null)
 
 function closeImportModal() {
     showImportModal.value = false
@@ -113,7 +113,7 @@ function onFileChange(e) {
 }
 
 function downloadSampleCsv() {
-    const content = 'title,status,topic\nNote A,draft,Math\nNote B,published,History\n'
+    const content = 'title,topic_id,status,content\nNote A,1,1,Test content 1\nNote B,2,2,test content 2\n'
     const blob = new Blob([content], { type: 'text/csv;charset=utf-8;' })
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
@@ -131,7 +131,7 @@ async function doImport() {
         const form = new FormData()
         form.append('file', selectedFile.value)
         const res = await axios.post('/api/notes/import', form, { headers: { 'Content-Type': 'multipart/form-data' } })
-        importResult.value = res.data
+        importResult.value = res.data?.data || null
         await reloadNotes()
     } catch (err) {
         console.error(err)
@@ -173,7 +173,7 @@ async function deleteNote(id) {
             </div>
             <div class=" flex gap-2 order-2 md:order-none md:ml-0">
                 <RouterLink :to="{ name: 'note.add' }" class="px-3 py-2 rounded-lg bg-blue-600 text-white hover:opacity-90">Add</RouterLink>
-                <button @click="showImportModal = true" class="px-3 py-2 rounded-lg bg-green-600 text-white hover:opacity-90">Import CSV</button>
+                <button @click="showImportModal = true" class="px-3 py-2 rounded-lg bg-green-600 text-white hover:opacity-90 hover:cursor-pointer">Import CSV</button>
             </div>
         </div>
 
@@ -190,18 +190,28 @@ async function deleteNote(id) {
                         File CSV/XLSX với cột: <code class="bg-gray-100 dark:bg-gray-800 px-1 rounded">title</code>, <code class="bg-gray-100 dark:bg-gray-800 px-1 rounded">status</code>, <code class="bg-gray-100 dark:bg-gray-800 px-1 rounded">topic</code>
                     </div>
                     <div class="flex items-center justify-between gap-2">
-                        <button type="button" class="px-3 py-2 rounded-md bg-amber-500 hover:bg-amber-600 text-white" @click="downloadSampleCsv">
+                        <button type="button" class="px-3 py-2 rounded-md bg-amber-500 hover:bg-amber-600 text-white hover:cursor-pointer" @click="downloadSampleCsv">
                             Xem mẫu CSV
                         </button>
                         <span v-if="selectedFileName" class="text-sm text-gray-600 dark:text-gray-300 truncate">{{ selectedFileName }}</span>
                         <input ref="fileInputRef" type="file" class="hidden" accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel" @change="onFileChange" />
-                        <button type="button" class="px-3 py-2 rounded-md bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200 border border-gray-200 dark:border-gray-700 hover:bg-gray-200 dark:hover:bg-gray-700" @click="triggerFilePicker">
+                        <button type="button" class=" hover:cursor-pointer px-3 py-2 rounded-md bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200 border border-gray-200 dark:border-gray-700 hover:bg-gray-200 dark:hover:bg-gray-700" @click="triggerFilePicker">
                             Chọn file
                         </button>
                     </div>
                     <div v-if="importResult" class="text-sm bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded p-3 text-gray-800 dark:text-gray-100">
                         <div class="mb-1">Kết quả:</div>
-                        <pre class="whitespace-pre-wrap text-xs">{{ JSON.stringify(importResult, null, 2) }}</pre>
+                        <ul class="list-disc pl-5 space-y-0.5">
+                            <li>Tạo mới: {{ importResult.created }}</li>
+                            <li>Cập nhật: {{ importResult.updated }}</li>
+                            <li>Bỏ qua: {{ importResult.skipped }}</li>
+                        </ul>
+                        <div v-if="importResult.errors?.length" class="mt-2">
+                            <div class="font-medium">Lỗi:</div>
+                            <ul class="list-disc pl-5 space-y-0.5">
+                                <li v-for="(err, idx) in importResult.errors" :key="idx">{{ err }}</li>
+                            </ul>
+                        </div>
                     </div>
                 </div>
                 <div class="flex items-center justify-end gap-2 px-4 py-3 border-t border-gray-200 dark:border-gray-800">
