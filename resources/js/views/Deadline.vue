@@ -21,7 +21,7 @@
             <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-4 mb-6">
                 <div v-if="showFilters" class="grid grid-cols-1 md:grid-cols-4 gap-4">
                     <!-- Search Box -->
-                    <div class="md:col-span-2">
+                    <div class="md:col-span-1">
                         <label class="block text-sm font-medium text-gray-700 mb-2">Tìm kiếm</label>
                         <div class="relative">
                             <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -66,6 +66,20 @@
                             <option value="3">Cao</option>
                         </select>
                     </div>
+
+                    <!-- Sort by Priority -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Sắp xếp theo độ ưu tiên</label>
+                        <select
+                            v-model="prioritySortOrder"
+                            class="block w-full px-3 py-2 border border-gray-300 rounded-md bg-white focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                        >
+                            <option value="">Mặc định</option>
+                            <option value="asc">Tăng dần</option>
+                            <option value="desc">Giảm dần</option>
+                        </select>
+                    </div>
+
                 </div>
 
                     <!-- Clear Filters Button -->
@@ -151,6 +165,26 @@
                                      class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg z-50 border border-gray-200"
                                      style="position: absolute; top: 100%; right: 0;">
                                     <div class="py-1">
+                                        <button
+                                            @click="navigateToView(deadline)"
+                                            class="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                                        >
+                                            <svg class="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path
+                                                    stroke-linecap="round"
+                                                    stroke-linejoin="round"
+                                                    stroke-width="2"
+                                                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                                                />
+                                                <path
+                                                    stroke-linecap="round"
+                                                    stroke-linejoin="round"
+                                                    stroke-width="2"
+                                                    d="M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7-1.274 4.057-5.065 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+                                                />
+                                            </svg>
+                                            Xem chi tiết
+                                        </button>
                                         <button @click="navigateToEdit(deadline)"
                                                 class="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
                                             <svg class="w-4 h-4 mr-3" fill="none" stroke="currentColor"
@@ -244,6 +278,7 @@ const expandedDeadlines = ref<number[]>([])
 const searchQuery = ref<string>('')
 const statusFilter = ref<string>('')
 const priorityFilter = ref<string>('')
+const prioritySortOrder = ref('');
 const showFilters = ref<boolean>(true)
 const activeOverflowMenu = ref<number | null>(null)
 
@@ -300,6 +335,12 @@ const filteredDeadlines = computed(() => {
         );
     }
 
+    if (prioritySortOrder.value === 'asc') {
+        filtered.sort((a, b) => a.priority - b.priority);
+    } else if (prioritySortOrder.value === 'desc') {
+        filtered.sort((a, b) => b.priority - a.priority);
+    }
+
     return filtered;
 })
 
@@ -310,16 +351,6 @@ const toggleDeadline = (deadlineId: number) => {
         expandedDeadlines.value.splice(index, 1);
     } else {
         expandedDeadlines.value.push(deadlineId);
-    }
-}
-
-const toggleSubtask = (deadlineId: number, subtaskId: number) => {
-    const deadline = deadlines.value.find(d => d.id === deadlineId);
-    if (deadline) {
-        const subtask = deadline.subtasks.find(s => s.id === subtaskId);
-        if (subtask) {
-            subtask.status = subtask.status === 2 ? 1 : 2;
-        }
     }
 }
 
@@ -396,6 +427,8 @@ const clearFilters = () => {
     searchQuery.value = '';
     statusFilter.value = '';
     priorityFilter.value = '';
+    prioritySortOrder.value = '';
+    fetchDeadlines();
 }
 
 const toggleFilters = () => {
@@ -407,11 +440,15 @@ const toggleOverflowMenu = (deadlineId: number) => {
 }
 
 const navigateToAdd = () => {
-    router.push('/deadlines/create');
+    router.push('/deadline/add');
 }
 
+const navigateToView = (deadline) => {
+    router.push(`/deadline/${deadline.id}`);
+    activeOverflowMenu.value = null;
+};
 const navigateToEdit = (deadline: any) => {
-    router.push(`/deadlines/${deadline.id}/edit`);
+    router.push(`/deadline/${deadline.id}/edit`);
     activeOverflowMenu.value = null;
 }
 
