@@ -25,12 +25,16 @@ class DeadlineController extends Controller
             }, 'subtasks_min_due_date')
             ->orderByRaw("
                 CASE
-                    WHEN subtasks_min_due_date < CURDATE() THEN 0
-                    ELSE 1
+                    WHEN status = 4 THEN 0   -- Overdue
+                    WHEN status = 1 THEN 1   -- In progress
+                    WHEN status = 2 THEN 2   -- Completed
+                    WHEN status = 3 THEN 3   -- Cancelled
+                    ELSE 4
                 END ASC,
-                ABS(DATEDIFF(subtasks_min_due_date, CURDATE())) ASC
+                subtasks_min_due_date ASC
             ")
             ->get();
+
 
 
         return $this->successResponse($deadlines);
