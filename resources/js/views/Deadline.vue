@@ -46,9 +46,10 @@
                             class="block w-full px-3 py-2 border border-gray-300 rounded-md bg-white focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
                         >
                             <option value="">Tất cả</option>
-                            <option value="1">Chờ xử lý</option>
-                            <option value="2">Đang thực hiện</option>
-                            <option value="3">Hoàn thành</option>
+                            <option value="1">Đang thực hiện</option>
+                            <option value="2">Đã hoàn thành</option>
+                            <option value="3">Đã huỷ</option>
+                            <option value="4">Quá hạn</option>
                         </select>
                     </div>
 
@@ -186,10 +187,6 @@
                                  class="bg-white rounded-md border border-gray-200 p-3 hover:shadow-sm transition-shadow duration-200">
                                 <div class="flex items-center justify-between">
                                     <div class="flex items-center space-x-3">
-                                        <input type="checkbox" :checked="subtask.status === 2"
-                                               @change="toggleSubtask(deadline.id, subtask.id)"
-                                               class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
-                                        />
                                         <div><h5 class="text-sm font-medium text-gray-800">{{ subtask.title }}</h5>
                                             <p v-if="subtask.content" class="text-xs text-gray-600 mt-1">
                                                 {{ subtask.content }}</p></div>
@@ -236,8 +233,11 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
+import axios from "axios";
+import { useToast } from '@/lib/toast'
 
 const router = useRouter()
+const { success } = useToast()
 
 // Reactive data
 const expandedDeadlines = ref<number[]>([])
@@ -247,125 +247,33 @@ const priorityFilter = ref<string>('')
 const showFilters = ref<boolean>(true)
 const activeOverflowMenu = ref<number | null>(null)
 
+type Topic = {
+    id: number,
+    name: string,
+}
+
+type Subtask = {
+    id: number,
+    deadline_id: number,
+    title: string,
+    content: string,
+    due_date: Date,
+    status: number,
+}
+
+type Deadline = {
+    id: number,
+    title: string,
+    description: string,
+    status: number,
+    priority: number,
+    topic_id: number,
+    topic?: Topic,
+    subtasks: Subtask[],
+}
+
 // Sample data
-const deadlines = ref([
-                {
-                    id: 1,
-                    title: 'Hoàn thành dự án website',
-                    description: 'Phát triển website bán hàng với Laravel và Vue.js',
-                    status: 1, // 1: pending, 2: in_progress, 3: completed
-                    priority: 2, // 1: low, 2: medium, 3: high
-                    topic_id: 1,
-                    created_at: '2024-01-15T08:00:00Z',
-                    updated_at: '2024-01-15T08:00:00Z',
-                    subtasks: [
-                        {
-                            id: 1,
-                            deadline_id: 1,
-                            title: 'Thiết kế giao diện',
-                            content: 'Tạo mockup và wireframe cho website',
-                            due_date: '2024-01-20T18:00:00Z',
-                            status: 2, // 1: pending, 2: in_progress, 3: completed
-                            created_at: '2024-01-15T08:00:00Z',
-                            updated_at: '2024-01-15T08:00:00Z'
-                        },
-                        {
-                            id: 2,
-                            deadline_id: 1,
-                            title: 'Setup database',
-                            content: 'Tạo migration và seeder cho database',
-                            due_date: '2024-01-18T18:00:00Z',
-                            status: 1,
-                            created_at: '2024-01-15T08:00:00Z',
-                            updated_at: '2024-01-15T08:00:00Z'
-                        },
-                        {
-                            id: 3,
-                            deadline_id: 1,
-                            title: 'Implement authentication',
-                            content: 'Tạo hệ thống đăng nhập và đăng ký',
-                            due_date: '2024-01-25T18:00:00Z',
-                            status: 1,
-                            created_at: '2024-01-15T08:00:00Z',
-                            updated_at: '2024-01-15T08:00:00Z'
-                        }
-                    ]
-                },
-                {
-                    id: 2,
-                    title: 'Học Vue.js 3',
-                    description: 'Nắm vững kiến thức về Vue.js 3 và Composition API',
-                    status: 2,
-                    priority: 3,
-                    topic_id: 2,
-                    created_at: '2024-01-10T08:00:00Z',
-                    updated_at: '2024-01-10T08:00:00Z',
-                    subtasks: [
-                        {
-                            id: 4,
-                            deadline_id: 2,
-                            title: 'Học Composition API',
-                            content: 'Tìm hiểu về setup(), ref(), reactive()',
-                            due_date: '2024-01-22T18:00:00Z',
-                            status: 2,
-                            created_at: '2024-01-10T08:00:00Z',
-                            updated_at: '2024-01-10T08:00:00Z'
-                        },
-                        {
-                            id: 5,
-                            deadline_id: 2,
-                            title: 'Thực hành với project nhỏ',
-                            content: 'Tạo todo app với Vue 3',
-                            due_date: '2024-01-28T18:00:00Z',
-                            status: 1,
-                            created_at: '2024-01-10T08:00:00Z',
-                            updated_at: '2024-01-10T08:00:00Z'
-                        }
-                    ]
-                },
-                {
-                    id: 3,
-                    title: 'Chuẩn bị presentation',
-                    description: 'Chuẩn bị bài thuyết trình cho cuộc họp tuần tới',
-                    status: 1,
-                    priority: 1,
-                    topic_id: 3,
-                    created_at: '2024-01-12T08:00:00Z',
-                    updated_at: '2024-01-12T08:00:00Z',
-                    subtasks: [
-                        {
-                            id: 6,
-                            deadline_id: 3,
-                            title: 'Thu thập dữ liệu',
-                            content: 'Gather data và statistics cho presentation',
-                            due_date: '2024-01-19T18:00:00Z',
-                            status: 1,
-                            created_at: '2024-01-12T08:00:00Z',
-                            updated_at: '2024-01-12T08:00:00Z'
-                        },
-                        {
-                            id: 7,
-                            deadline_id: 3,
-                            title: 'Tạo slide deck',
-                            content: 'Design và tạo PowerPoint presentation',
-                            due_date: '2024-01-24T18:00:00Z',
-                            status: 1,
-                            created_at: '2024-01-12T08:00:00Z',
-                            updated_at: '2024-01-12T08:00:00Z'
-                        },
-                        {
-                            id: 8,
-                            deadline_id: 3,
-                            title: 'Rehearse presentation',
-                            content: 'Luyện tập thuyết trình trước khi present',
-                            due_date: '2024-01-26T18:00:00Z',
-                            status: 1,
-                            created_at: '2024-01-12T08:00:00Z',
-                            updated_at: '2024-01-12T08:00:00Z'
-                        }
-                    ]
-                },
-        ])
+const deadlines = ref<Deadline[]>([])
 
 // Computed properties
 const filteredDeadlines = computed(() => {
@@ -435,36 +343,40 @@ const getPriorityText = (priority: number) => {
 
 const getStatusClass = (status: number) => {
     const classes: Record<number, string> = {
-        1: 'bg-gray-100 text-gray-800',
-        2: 'bg-blue-100 text-blue-800',
-        3: 'bg-green-100 text-green-800'
+        1: 'bg-blue-100 text-blue-800',
+        2: 'bg-green-100 text-green-800',
+        3: 'bg-gray-100 text-gray-800',
+        4: 'bg-red-100 text-red-800'
     };
     return classes[status] || classes[1];
 }
 
 const getStatusText = (status: number) => {
     const texts: Record<number, string> = {
-        1: 'Chờ xử lý',
-        2: 'Đang thực hiện',
-        3: 'Hoàn thành'
+        1: 'Đang thực hiện',
+        2: 'Đã Hoàn thành',
+        3: 'Đã Huỷ',
+        4: 'Quá Hạn',
     };
     return texts[status] || texts[1];
 }
 
 const getSubtaskStatusClass = (status: number) => {
     const classes: Record<number, string> = {
-        1: 'bg-gray-100 text-gray-800',
-        2: 'bg-blue-100 text-blue-800',
-        3: 'bg-green-100 text-green-800'
+        1: 'bg-blue-100 text-blue-800',
+        2: 'bg-green-100 text-green-800',
+        3: 'bg-gray-100 text-gray-800',
+        4: 'bg-red-100 text-red-800'
     };
     return classes[status] || classes[1];
 }
 
 const getSubtaskStatusText = (status: number) => {
     const texts: Record<number, string> = {
-        1: 'Chờ',
-        2: 'Đang làm',
-        3: 'Xong'
+        1: 'Đang làm',
+        2: 'Hoàn thành',
+        3: 'Huỷ',
+        4: 'Quá hạn',
     };
     return texts[status] || texts[1];
 }
@@ -513,8 +425,19 @@ const deleteDeadline = (deadlineId: number) => {
     activeOverflowMenu.value = null;
 }
 
+async function fetchDeadlines() {
+    try {
+        const res = await axios.get('/api/deadlines');
+        deadlines.value = res.data.data;
+    }
+    catch (error) {
+
+    }
+}
+
 // Lifecycle
 onMounted(() => {
+    fetchDeadlines();
     // Close overflow menu when clicking outside
     document.addEventListener('click', (e) => {
         if (!e.target.closest('.relative')) {
