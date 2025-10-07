@@ -44,7 +44,14 @@ class DeadlineController extends Controller
     {
         $deadline = Deadline::query()
             ->with(['topic:id,name', 'subtasks'])
-            ->findOrFail($deadlineid);
+            ->select('*')
+            ->selectSub(function ($query) {
+                $query->from('subtasks')
+                    ->selectRaw('MIN(due_date)')
+                    ->whereColumn('subtasks.deadline_id', 'deadlines.id');
+            }, 'subtasks_min_due_date')
+            ->where('id', $deadlineid)
+            ->firstOrFail();
 
         return $this->successResponse($deadline);
     }
