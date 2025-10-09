@@ -271,7 +271,7 @@ import axios from "axios";
 import { useToast } from '@/lib/toast'
 
 const router = useRouter()
-const { success } = useToast()
+const { success,error } = useToast()
 
 // Reactive data
 const expandedDeadlines = ref<number[]>([])
@@ -452,14 +452,24 @@ const navigateToEdit = (deadline: any) => {
     activeOverflowMenu.value = null;
 }
 
-const deleteDeadline = (deadlineId: number) => {
-    if (confirm('Bạn có chắc chắn muốn xóa deadline này?')) {
-        const index = deadlines.value.findIndex(d => d.id === deadlineId);
-        if (index > -1) {
-            deadlines.value.splice(index, 1);
+const deleteDeadline = async (deadlineId: number) => {
+    if (!confirm('Bạn có chắc chắn muốn xoá deadline này?')) return
+
+    try {
+        await axios.delete(`/api/deadlines/${deadlineId}`)
+
+        const index = deadlines.value.findIndex(d => d.id === deadlineId)
+        if (index !== -1) {
+            deadlines.value.splice(index, 1)
         }
+
+        success('Xoá deadline thành công!')
+    } catch (err) {
+        console.error(err)
+        error('Có lỗi xảy ra khi xoá deadline.')
+    } finally {
+        activeOverflowMenu.value = null
     }
-    activeOverflowMenu.value = null;
 }
 
 async function fetchDeadlines() {
