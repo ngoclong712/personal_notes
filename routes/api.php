@@ -20,8 +20,10 @@ Route::put('/notes/{note}', [NoteController::class, 'update'])->name('notes.upda
 Route::delete('/notes/{note}', [NoteController::class, 'destroy'])->name('notes.destroy');
 Route::post('/notes/import', [NoteController::class, 'import'])->name('notes.import');
 
+Route::get('/deadlines/update-overdue', [DeadlineController::class, 'updateOverdue'])->name('deadlines.update-overdue');
+
 Route::get('/deadlines', [DeadlineController::class, 'index'])->name('deadlines');
 Route::get('/deadlines/{id}', [DeadlineController::class, 'show'])->name('deadlines.show');
 Route::post('/deadlines', [DeadlineController::class, 'store'])->name('deadlines.store');
-Route::put('/deadlines/{id}', [DeadlineController::class, 'update'])->name('deadlines.update');
-Route::delete('/deadlines/{id}', [DeadlineController::class, 'destroy'])->name('deadlines.destroy');
+Route::put('/deadlines/{deadline}', [DeadlineController::class, 'update'])->name('deadlines.update');
+Route::delete('/deadlines/{deadline}', [DeadlineController::class, 'destroy'])->name('deadlines.destroy');
