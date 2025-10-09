@@ -16,6 +16,8 @@ import EditNote from "@/views/notes/EditNote.vue";
 import NoteDetail from "@/views/notes/NoteDetail.vue";
 
 import DeadlineDetail from "@/views/deadlines/DeadlineDetail.vue";
+import AddDeadline from "@/views/deadlines/AddDeadline.vue";
+import EditDeadline from "@/views/deadlines/EditDeadline.vue";
 
 import Test from "@/views/Test.vue";
 
@@ -89,6 +91,16 @@ const routes = [
                 path: 'deadline/:id',
                 name: 'deadline.detail',
                 component: DeadlineDetail,
+            },
+            {
+                path: 'deadline/add',
+                name: 'deadline.add',
+                component: AddDeadline,
+            },
+            {
+                path: 'deadline/:id/edit',
+                name: 'deadline.edit',
+                component: EditDeadline,
             }
         ]
     }
