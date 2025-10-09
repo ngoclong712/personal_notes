@@ -289,6 +289,21 @@ function truncate(text: string | null, maxLength = 80): string {
 
 function formatDate(value: string): string {
     const d = new Date(value)
-    return isNaN(d.getTime()) ? value : d.toLocaleString()
+    if (isNaN(d.getTime())) return value
+
+    const day = d.getDate().toString().padStart(2, '0')
+    const month = (d.getMonth() + 1).toString().padStart(2, '0')
+    const year = d.getFullYear()
+
+    let hours = d.getHours()
+    const minutes = d.getMinutes().toString().padStart(2, '0')
+    const seconds = d.getSeconds().toString().padStart(2, '0')
+
+    const ampm = hours >= 12 ? 'PM' : 'AM'
+    hours = hours % 12
+    hours = hours ? hours : 12 // 0 -> 12
+
+    return `${day}/${month}/${year}, ${hours}:${minutes}:${seconds} ${ampm}`
 }
+
 </script>

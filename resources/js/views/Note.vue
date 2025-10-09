@@ -55,6 +55,15 @@ onMounted(async () => {
     await reloadNotes()
 })
 
+function formatDate(dateStr) {
+    if (!dateStr) return "—";
+    const d = new Date(dateStr);
+    const day = String(d.getDate()).padStart(2, "0");
+    const month = String(d.getMonth() + 1).padStart(2, "0");
+    const year = d.getFullYear();
+    return `${day}/${month}/${year}`;
+}
+
 async function reloadNotes() {
     loading.value = true
     const res = await axios.get('/api/notes')
@@ -65,7 +74,7 @@ async function reloadNotes() {
         title: r.title,
         topic: r.topic?.name ?? 'Null',
         status: r.status, // numeric enum
-        updatedAt: r.updated_at ? new Date(r.updated_at).toISOString().slice(0, 10) : ''
+        updatedAt: formatDate(r.updated_at)
     }))
     loading.value = false
 }
