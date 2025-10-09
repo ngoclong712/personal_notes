@@ -64,10 +64,8 @@ class NoteController extends Controller
     {
         DB::beginTransaction();
         try {
-            // 1. Update thông tin note
             $note->update($request->validated());
 
-            // 2. Xoá file cũ nếu có deleted_ids
             if ($request->filled('deleted_ids')) {
                 $ids = $request->input('deleted_ids', []);
                 $attachments = $note->attachments()->whereIn('id', $ids)->get();
@@ -78,7 +76,6 @@ class NoteController extends Controller
                 }
             }
 
-            // 3. Upload file mới nếu có
             if ($request->hasFile('attachments')) {
                 foreach ($request->file('attachments') as $file) {
                     $path = $file->store('attachments', 'public');
