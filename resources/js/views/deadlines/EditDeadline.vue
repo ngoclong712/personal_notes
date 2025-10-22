@@ -25,15 +25,15 @@ const form = ref({
 const topics = ref([])
 
 const priorities = [
-    { id: 1, text: 'Thấp' },
-    { id: 2, text: 'Trung bình' },
-    { id: 3, text: 'Cao' },
+    { id: 1, text: 'Low' },
+    { id: 2, text: 'Medium' },
+    { id: 3, text: 'High' },
 ]
 
 const subtaskStatuses = [
-    { id: 1, text: 'Đang thực hiện' },
-    { id: 2, text: 'Hoàn thành' },
-    { id: 3, text: 'Đã hủy' },
+    { id: 1, text: 'In Progress' },
+    { id: 2, text: 'Completed' },
+    { id: 3, text: 'Cancelled' },
 ]
 
 const loading = ref(false)
@@ -68,11 +68,11 @@ const submit = async () => {
     try {
         form.value.topic_id = form.value.topic?.id || null
         await axios.put(`/api/deadlines/${form.value.id}`, form.value)
-        success('Cập nhật deadline thành công!')
+        success('Deadline updated successfully!')
         setTimeout(() => router.push('/deadline'), 1000)
     } catch (err) {
         console.error(err)
-        error('Không thể cập nhật deadline')
+        error('Failed to update deadline')
     } finally {
         loading.value = false
     }
@@ -98,12 +98,12 @@ onMounted(async () => {
             topic_id: data.topic?.id || null,
             subtasks: (data.subtasks || []).map((s: any) => ({
                 ...s,
-                due_date: s.due_date ? new Date(s.due_date).toISOString().split('T')[0] : '', // fix yyyy-MM-dd
+                due_date: s.due_date ? new Date(s.due_date).toISOString().split('T')[0] : '',
             })),
         }
     } catch (err) {
         console.error(err)
-        error('Không thể tải dữ liệu deadline')
+        error('Failed to load deadline data')
     }
 })
 </script>
@@ -113,23 +113,23 @@ onMounted(async () => {
         <!-- Header -->
         <div class="flex items-center w-full">
             <CalendarCheck class="w-7 h-7 mr-2 text-emerald-600" />
-            <h2 class="text-2xl font-semibold text-gray-800">Cập nhật Deadline</h2>
+            <h2 class="text-2xl font-semibold text-gray-800">Update Deadline</h2>
         </div>
 
-        <!-- Thông tin Deadline -->
+        <!-- Deadline Info -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Tiêu đề</label>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Title</label>
                 <input
                     v-model="form.title"
                     type="text"
-                    placeholder="Nhập tiêu đề deadline"
+                    placeholder="Enter deadline title"
                     class="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-emerald-400"
                 />
             </div>
 
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Mức độ ưu tiên</label>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Priority</label>
                 <select v-model="form.priority" class="w-full border border-gray-300 rounded-md px-3 py-2">
                     <option v-for="p in priorities" :key="p.id" :value="p.id">{{ p.text }}</option>
                 </select>
@@ -142,17 +142,17 @@ onMounted(async () => {
                     :options="topics"
                     label="name"
                     track-by="id"
-                    placeholder="-- Chọn topic --"
+                    placeholder="-- Select topic --"
                     class="w-full border border-gray-300 rounded-md"
                 />
             </div>
 
             <div class="md:col-span-2">
-                <label class="block text-sm font-medium text-gray-700 mb-1">Mô tả</label>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Description</label>
                 <textarea
                     v-model="form.description"
                     rows="3"
-                    placeholder="Nhập mô tả cho deadline"
+                    placeholder="Enter description for deadline"
                     class="w-full border border-gray-300 rounded-md px-3 py-2"
                 ></textarea>
             </div>
@@ -160,17 +160,17 @@ onMounted(async () => {
 
         <!-- Subtask header -->
         <div class="flex justify-between items-center mt-6">
-            <h3 class="text-lg font-semibold text-gray-800">Công việc con</h3>
+            <h3 class="text-lg font-semibold text-gray-800">Subtasks</h3>
             <button
                 type="button"
                 class="flex items-center gap-1 bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1.5 rounded-lg"
                 @click="openModal"
             >
-                <Plus class="w-4 h-4" /> Thêm Subtask
+                <Plus class="w-4 h-4" /> Add Subtask
             </button>
         </div>
 
-        <!-- Danh sách Subtask -->
+        <!-- Subtask list -->
         <div v-if="form.subtasks.length" class="space-y-3 mt-3">
             <div
                 v-for="(subtask, index) in form.subtasks"
@@ -186,25 +186,23 @@ onMounted(async () => {
                 </button>
 
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <!-- Left: Title + Content -->
                     <div class="md:col-span-2">
                         <input
                             v-model="subtask.title"
-                            placeholder="Tên subtask..."
+                            placeholder="Subtask title..."
                             class="font-medium text-gray-800 w-full border-b border-transparent focus:border-gray-300 focus:outline-none mb-1"
                         />
                         <textarea
                             v-model="subtask.content"
                             rows="2"
                             class="text-sm text-gray-600 w-full border border-gray-200 rounded-md px-2 py-1"
-                            placeholder="Nội dung công việc..."
+                            placeholder="Subtask details..."
                         ></textarea>
                     </div>
 
-                    <!-- Right: Date + Status -->
                     <div class="space-y-2">
                         <div class="text-sm">
-                            <label class="block text-gray-700 mb-1">Hạn:</label>
+                            <label class="block text-gray-700 mb-1">Due Date:</label>
                             <input
                                 type="date"
                                 v-model="subtask.due_date"
@@ -212,7 +210,7 @@ onMounted(async () => {
                             />
                         </div>
                         <div class="text-sm">
-                            <label class="block text-gray-700 mb-1">Trạng thái:</label>
+                            <label class="block text-gray-700 mb-1">Status:</label>
                             <select
                                 v-model="subtask.status"
                                 class="w-full border border-gray-300 rounded-md px-2 py-1 text-gray-700"
@@ -233,40 +231,40 @@ onMounted(async () => {
                 :disabled="loading"
                 @click="submit"
             >
-                {{ loading ? 'Đang cập nhật...' : 'Cập nhật Deadline' }}
+                {{ loading ? 'Updating...' : 'Update Deadline' }}
             </button>
         </div>
 
-        <!-- Modal thêm Subtask -->
+        <!-- Modal -->
         <div v-if="showModal" class="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
             <div class="bg-white rounded-xl shadow-lg w-full max-w-md p-6 relative">
                 <button @click="closeModal" class="absolute top-3 right-3 text-gray-500 hover:text-gray-700">
                     <X class="w-5 h-5" />
                 </button>
 
-                <h3 class="text-lg font-semibold mb-4 text-gray-800">Thêm Subtask</h3>
+                <h3 class="text-lg font-semibold mb-4 text-gray-800">Add Subtask</h3>
 
                 <div class="space-y-3">
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Tiêu đề</label>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Title</label>
                         <input
                             v-model="newSubtask.title"
                             type="text"
                             class="w-full border border-gray-300 rounded-md px-3 py-2"
-                            placeholder="Nhập tiêu đề..."
+                            placeholder="Enter title..."
                         />
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Nội dung</label>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Content</label>
                         <textarea
                             v-model="newSubtask.content"
                             rows="2"
                             class="w-full border border-gray-300 rounded-md px-3 py-2"
-                            placeholder="Nhập nội dung..."
+                            placeholder="Enter content..."
                         ></textarea>
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Hạn hoàn thành</label>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Due Date</label>
                         <input
                             v-model="newSubtask.due_date"
                             type="date"
@@ -274,7 +272,7 @@ onMounted(async () => {
                         />
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Trạng thái</label>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Status</label>
                         <select
                             v-model="newSubtask.status"
                             class="w-full border border-gray-300 rounded-md px-3 py-2"
@@ -289,13 +287,13 @@ onMounted(async () => {
                         @click="closeModal"
                         class="px-3 py-1.5 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-100"
                     >
-                        Hủy
+                        Cancel
                     </button>
                     <button
                         @click="addSubtask"
                         class="px-3 py-1.5 rounded-lg bg-emerald-600 text-white hover:bg-emerald-700"
                     >
-                        Lưu
+                        Save
                     </button>
                 </div>
             </div>

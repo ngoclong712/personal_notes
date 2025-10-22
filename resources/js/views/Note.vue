@@ -113,7 +113,7 @@ function onFileChange(e) {
         'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
     ]
     if (!allowed.includes(file.type) && !/\.(csv|xlsx)$/i.test(file.name)) {
-        alert('Vui lòng chọn file .csv hoặc .xlsx')
+        alert('Please select appropriate file')
         input.value = ''
         return
     }
@@ -144,7 +144,7 @@ async function doImport() {
         await reloadNotes()
     } catch (err) {
         console.error(err)
-        alert(err?.response?.data?.message || 'Import thất bại')
+        alert(err?.response?.data?.message || 'Import failed')
     } finally {
         importing.value = false
     }
@@ -196,27 +196,31 @@ async function deleteNote(id) {
                 </div>
                 <div class="p-4 space-y-4">
                     <div class="text-sm text-gray-700 dark:text-gray-300">
-                        File CSV/XLSX với cột: <code class="bg-gray-100 dark:bg-gray-800 px-1 rounded">title</code>, <code class="bg-gray-100 dark:bg-gray-800 px-1 rounded">status</code>, <code class="bg-gray-100 dark:bg-gray-800 px-1 rounded">topic</code>
+                        CSV/XLSX file with columns:
+                        <code class="bg-gray-100 dark:bg-gray-800 px-1 rounded">title</code>,
+                        <code class="bg-gray-100 dark:bg-gray-800 px-1 rounded">topic id</code>,
+                        <code class="bg-gray-100 dark:bg-gray-800 px-1 rounded">status</code>,
+                        <code class="bg-gray-100 dark:bg-gray-800 px-1 rounded">content</code>
                     </div>
                     <div class="flex items-center justify-between gap-2">
                         <button type="button" class="px-3 py-2 rounded-md bg-amber-500 hover:bg-amber-600 text-white hover:cursor-pointer" @click="downloadSampleCsv">
-                            Xem mẫu CSV
+                            View CSV sample
                         </button>
                         <span v-if="selectedFileName" class="text-sm text-gray-600 dark:text-gray-300 truncate">{{ selectedFileName }}</span>
                         <input ref="fileInputRef" type="file" class="hidden" accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel" @change="onFileChange" />
                         <button type="button" class=" hover:cursor-pointer px-3 py-2 rounded-md bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200 border border-gray-200 dark:border-gray-700 hover:bg-gray-200 dark:hover:bg-gray-700" @click="triggerFilePicker">
-                            Chọn file
+                            Choose file
                         </button>
                     </div>
                     <div v-if="importResult" class="text-sm bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded p-3 text-gray-800 dark:text-gray-100">
-                        <div class="mb-1">Kết quả:</div>
+                        <div class="mb-1">Result:</div>
                         <ul class="list-disc pl-5 space-y-0.5">
-                            <li>Tạo mới: {{ importResult.created }}</li>
-                            <li>Cập nhật: {{ importResult.updated }}</li>
-                            <li>Bỏ qua: {{ importResult.skipped }}</li>
+                            <li>Create: {{ importResult.created }}</li>
+                            <li>Update: {{ importResult.updated }}</li>
+                            <li>Skip: {{ importResult.skipped }}</li>
                         </ul>
                         <div v-if="importResult.errors?.length" class="mt-2">
-                            <div class="font-medium">Lỗi:</div>
+                            <div class="font-medium">Error:</div>
                             <ul class="list-disc pl-5 space-y-0.5">
                                 <li v-for="(err, idx) in importResult.errors" :key="idx">{{ err }}</li>
                             </ul>
@@ -226,7 +230,7 @@ async function deleteNote(id) {
                 <div class="flex items-center justify-end gap-2 px-4 py-3 border-t border-gray-200 dark:border-gray-800">
                     <button type="button" class="px-3 py-2 rounded-md border border-gray-200 dark:border-gray-700 text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800" @click="closeImportModal">Hủy</button>
                     <button type="button" class="px-3 py-2 rounded-md bg-green-600 hover:bg-green-700 disabled:opacity-60 disabled:cursor-not-allowed text-white" :disabled="!selectedFile || importing" @click="doImport">
-                        <span v-if="importing">Đang import...</span>
+                        <span v-if="importing">Importing...</span>
                         <span v-else>Import</span>
                     </button>
                 </div>

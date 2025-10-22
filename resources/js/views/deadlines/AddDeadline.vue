@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref,onMounted,computed } from 'vue'
+import { ref, onMounted } from 'vue'
 import axios from 'axios'
 import { Plus, Trash2, X, CalendarCheck } from 'lucide-vue-next'
 import { useRouter } from 'vue-router'
@@ -23,15 +23,14 @@ const form = ref({
 const topics = ref([])
 
 const priorities = [
-    { id: 1, text: 'Thấp' },
-    { id: 2, text: 'Trung bình' },
-    { id: 3, text: 'Cao' },
+    { id: 1, text: 'Low' },
+    { id: 2, text: 'Medium' },
+    { id: 3, text: 'High' },
 ]
 
 const loading = ref(false)
 const showModal = ref(false)
 
-// ===== Methods =====
 const openModal = () => {
     showModal.value = true
 }
@@ -63,11 +62,11 @@ const submit = async () => {
     try {
         form.value.topic_id = form.value.topic?.id || null
         await axios.post('/api/deadlines', form.value)
-        success('Deadline created')
+        success('Deadline created successfully!')
         setTimeout(() => router.push('/deadline'), 1000)
-    } catch (error) {
-        console.error(error)
-        error('Cannot create deadline')
+    } catch (err) {
+        console.error(err)
+        error('Failed to create deadline.')
     } finally {
         loading.value = false
     }
@@ -75,44 +74,42 @@ const submit = async () => {
 
 onMounted(async () => {
     try {
-        const res = await axios.get('/api/topics');
-        topics.value = res.data.data;
-    }
-    catch (error) {
-        console.error('Can not get topics')
+        const res = await axios.get('/api/topics')
+        topics.value = res.data.data
+    } catch (err) {
+        console.error('Failed to fetch topics.')
     }
 })
-
 
 const formatDate = (dateString: string) => {
     if (!dateString) return ''
     const date = new Date(dateString)
     if (isNaN(date.getTime())) return dateString
-    return date.toLocaleDateString('vi-VN')
+    return date.toLocaleDateString('en-GB')
 }
 </script>
 
 <template>
     <div class="max-w-4xl mx-auto bg-white shadow-lg rounded-xl p-6 space-y-6 mt-8 relative">
         <div class="flex items-center w-full">
-            <CalendarCheck class="w-7 h-7 mr-2"></CalendarCheck>
-            <h2 class="text-2xl font-semibold text-gray-800"> Thêm Deadline Mới</h2>
+            <CalendarCheck class="w-7 h-7 mr-2" />
+            <h2 class="text-2xl font-semibold text-gray-800">Add New Deadline</h2>
         </div>
 
-        <!-- Thông tin Deadline -->
+        <!-- Deadline Info -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Tiêu đề</label>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Title</label>
                 <input
                     v-model="form.title"
                     type="text"
-                    placeholder="Nhập tiêu đề deadline"
+                    placeholder="Enter deadline title"
                     class="w-full border rounded-md px-3 py-2"
                 />
             </div>
 
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Mức độ ưu tiên</label>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Priority</label>
                 <select
                     v-model="form.priority"
                     class="w-full border rounded-md px-3 py-2"
@@ -130,17 +127,17 @@ const formatDate = (dateString: string) => {
                     :options="topics"
                     label="name"
                     track-by="id"
-                    placeholder="-- Please Select Topic --"
+                    placeholder="-- Select Topic --"
                     class="w-full border rounded-md"
                 />
             </div>
 
             <div class="md:col-span-2">
-                <label class="block text-sm font-medium text-gray-700 mb-1">Mô tả</label>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Description</label>
                 <textarea
                     v-model="form.description"
                     rows="3"
-                    placeholder="Nhập mô tả cho deadline"
+                    placeholder="Enter description for the deadline"
                     class="w-full border rounded-md px-3 py-2"
                 ></textarea>
             </div>
@@ -148,17 +145,17 @@ const formatDate = (dateString: string) => {
 
         <!-- Subtask header -->
         <div class="flex justify-between items-center mt-6">
-            <h3 class="text-lg font-semibold text-gray-800">Công việc con</h3>
+            <h3 class="text-lg font-semibold text-gray-800">Subtasks</h3>
             <button
                 type="button"
                 class="flex items-center gap-1 bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1.5 rounded-lg"
                 @click="openModal"
             >
-                <Plus class="w-4 h-4" /> Thêm Subtask
+                <Plus class="w-4 h-4" /> Add Subtask
             </button>
         </div>
 
-        <!-- Danh sách Subtask -->
+        <!-- Subtask list -->
         <div v-if="form.subtasks.length" class="space-y-3 mt-3">
             <div
                 v-for="(subtask, index) in form.subtasks"
@@ -178,7 +175,7 @@ const formatDate = (dateString: string) => {
                         <p class="text-sm text-gray-600">{{ subtask.content }}</p>
                     </div>
                     <div class="text-sm text-gray-500 text-right mt-2">
-                        Hạn: <span class="font-medium text-gray-700">{{ formatDate(subtask.due_date) }}</span>
+                        Due: <span class="font-medium text-gray-700">{{ formatDate(subtask.due_date) }}</span>
                     </div>
                 </div>
             </div>
@@ -192,11 +189,11 @@ const formatDate = (dateString: string) => {
                 :disabled="loading"
                 @click="submit"
             >
-                {{ loading ? 'Đang lưu...' : 'Lưu Deadline' }}
+                {{ loading ? 'Saving...' : 'Save Deadline' }}
             </button>
         </div>
 
-        <!-- Modal thêm Subtask -->
+        <!-- Modal: Add Subtask -->
         <div
             v-if="showModal"
             class="fixed inset-0 bg-black/40 flex items-center justify-center z-50"
@@ -209,29 +206,29 @@ const formatDate = (dateString: string) => {
                     <X class="w-5 h-5" />
                 </button>
 
-                <h3 class="text-lg font-semibold mb-4">Thêm Subtask</h3>
+                <h3 class="text-lg font-semibold mb-4">Add Subtask</h3>
 
                 <div class="space-y-3">
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Tiêu đề</label>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Title</label>
                         <input
                             v-model="newSubtask.title"
                             type="text"
                             class="w-full border rounded-md px-3 py-2"
-                            placeholder="Nhập tiêu đề..."
+                            placeholder="Enter subtask title"
                         />
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Nội dung</label>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Content</label>
                         <textarea
                             v-model="newSubtask.content"
                             rows="2"
                             class="w-full border rounded-md px-3 py-2"
-                            placeholder="Nhập nội dung..."
+                            placeholder="Enter subtask content"
                         ></textarea>
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Hạn hoàn thành</label>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Due Date</label>
                         <input
                             v-model="newSubtask.due_date"
                             type="date"
@@ -245,13 +242,13 @@ const formatDate = (dateString: string) => {
                         @click="closeModal"
                         class="px-3 py-1.5 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-100"
                     >
-                        Hủy
+                        Cancel
                     </button>
                     <button
                         @click="addSubtask"
                         class="px-3 py-1.5 rounded-lg bg-emerald-600 text-white hover:bg-emerald-700"
                     >
-                        Lưu
+                        Save
                     </button>
                 </div>
             </div>

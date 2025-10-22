@@ -4,7 +4,7 @@
             <div class="flex items-center justify-between mb-4">
                 <div>
                     <h1 class="text-3xl font-bold text-gray-800 mb-2">Deadlines</h1>
-                    <p class="text-gray-600">Quản lý deadline và subtasks của bạn</p>
+                    <p class="text-gray-600">Deadlines and Subtask management</p>
                 </div>
                 <button
                     @click="navigateToAdd"
@@ -13,7 +13,7 @@
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
                     </svg>
-                    <span>Thêm Deadline</span>
+                    <span>Add new Deadline</span>
                 </button>
             </div>
 
@@ -22,7 +22,7 @@
                 <div v-if="showFilters" class="grid grid-cols-1 md:grid-cols-4 gap-4">
                     <!-- Search Box -->
                     <div class="md:col-span-1">
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Tìm kiếm</label>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Search</label>
                         <div class="relative">
                             <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                 <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -32,7 +32,7 @@
                             <input
                                 v-model="searchQuery"
                                 type="text"
-                                placeholder="Tìm kiếm theo tiêu đề..."
+                                placeholder="Find by deadline title..."
                                 class="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
                             />
                         </div>
@@ -40,43 +40,43 @@
 
                     <!-- Status Filter -->
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Trạng thái</label>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Status</label>
                         <select
                             v-model="statusFilter"
                             class="block w-full px-3 py-2 border border-gray-300 rounded-md bg-white focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
                         >
-                            <option value="">Tất cả</option>
-                            <option value="1">Đang thực hiện</option>
-                            <option value="2">Đã hoàn thành</option>
-                            <option value="3">Đã huỷ</option>
-                            <option value="4">Quá hạn</option>
+                            <option value="">All Status</option>
+                            <option value="1">In Progress</option>
+                            <option value="2">Completed</option>
+                            <option value="3">Cancelled</option>
+                            <option value="4">Overdue</option>
                         </select>
                     </div>
 
                     <!-- Priority Filter -->
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Độ ưu tiên</label>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Priority</label>
                         <select
                             v-model="priorityFilter"
                             class="block w-full px-3 py-2 border border-gray-300 rounded-md bg-white focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
                         >
-                            <option value="">Tất cả</option>
-                            <option value="1">Thấp</option>
-                            <option value="2">Trung bình</option>
-                            <option value="3">Cao</option>
+                            <option value="">All priority</option>
+                            <option value="1">Low</option>
+                            <option value="2">Medium</option>
+                            <option value="3">High</option>
                         </select>
                     </div>
 
                     <!-- Sort by Priority -->
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Sắp xếp theo độ ưu tiên</label>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Sort by priority</label>
                         <select
                             v-model="prioritySortOrder"
                             class="block w-full px-3 py-2 border border-gray-300 rounded-md bg-white focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
                         >
-                            <option value="">Mặc định</option>
-                            <option value="asc">Tăng dần</option>
-                            <option value="desc">Giảm dần</option>
+                            <option value="">Default</option>
+                            <option value="asc">Increasing</option>
+                            <option value="desc">Decreasing</option>
                         </select>
                     </div>
 
@@ -91,7 +91,7 @@
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
                             </svg>
-                            <span>Xóa bộ lọc</span>
+                            <span>Reset filter</span>
                         </button>
                     </div>
 
@@ -110,7 +110,7 @@
                         >
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
                         </svg>
-                        <span>{{ showFilters ? 'Thu gọn bộ lọc' : 'Mở rộng bộ lọc' }}</span>
+                        <span>{{ showFilters ? 'Collapse filter' : 'Expand Filter' }}</span>
                     </button>
                 </div>
             </div>
@@ -183,7 +183,7 @@
                                                     d="M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7-1.274 4.057-5.065 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
                                                 />
                                             </svg>
-                                            Xem chi tiết
+                                            View Detail
                                         </button>
                                         <button @click="navigateToEdit(deadline)"
                                                 class="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
@@ -193,7 +193,7 @@
                                                       d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z">
                                                 </path>
                                             </svg>
-                                            Chỉnh sửa
+                                            Edit
                                         </button>
                                         <button @click="deleteDeadline(deadline.id)"
                                                 class="flex items-center w-full px-4 py-2 text-sm text-red-600 hover:bg-red-50">
@@ -202,7 +202,7 @@
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                       d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
                                             </svg>
-                                            Xóa
+                                            Delete
                                         </button>
                                     </div>
                                 </div>
@@ -246,8 +246,8 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
                 </svg>
             </div>
-            <h3 class="text-lg font-medium text-gray-900 mb-2">Chưa có deadline nào</h3>
-            <p class="text-gray-500">Tạo deadline đầu tiên để bắt đầu quản lý công việc của bạn.</p>
+            <h3 class="text-lg font-medium text-gray-900 mb-2">You have no deadlines</h3>
+            <p class="text-gray-500">Create your first deadline to start managing your work.</p>
         </div>
 
         <!-- No Results State -->
@@ -257,8 +257,8 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
                 </svg>
             </div>
-            <h3 class="text-lg font-medium text-gray-900 mb-2">Không tìm thấy kết quả</h3>
-            <p class="text-gray-500">Thử thay đổi bộ lọc hoặc từ khóa tìm kiếm.</p>
+            <h3 class="text-lg font-medium text-gray-900 mb-2">No result found</h3>
+            <p class="text-gray-500">Try changing your search filters or keywords.</p>
         </div>
 
     </div>
@@ -365,9 +365,9 @@ const getPriorityClass = (priority: number) => {
 
 const getPriorityText = (priority: number) => {
     const texts: Record<number, string> = {
-        1: 'Thấp',
-        2: 'Trung bình',
-        3: 'Cao'
+        1: 'Low',
+        2: 'Medium',
+        3: 'High'
     };
     return texts[priority] || texts[1];
 }
@@ -384,10 +384,10 @@ const getStatusClass = (status: number) => {
 
 const getStatusText = (status: number) => {
     const texts: Record<number, string> = {
-        1: 'Đang thực hiện',
-        2: 'Đã Hoàn thành',
-        3: 'Đã Huỷ',
-        4: 'Quá Hạn',
+        1: 'In progress',
+        2: 'Completed',
+        3: 'Cancelled',
+        4: 'Overdue',
     };
     return texts[status] || texts[1];
 }
@@ -404,10 +404,10 @@ const getSubtaskStatusClass = (status: number) => {
 
 const getSubtaskStatusText = (status: number) => {
     const texts: Record<number, string> = {
-        1: 'Đang làm',
-        2: 'Hoàn thành',
-        3: 'Huỷ',
-        4: 'Quá hạn',
+        1: 'In progress',
+        2: 'Completed',
+        3: 'Cancelled',
+        4: 'Overdue',
     };
     return texts[status] || texts[1];
 }
@@ -451,7 +451,7 @@ const navigateToEdit = (deadline: any) => {
 }
 
 const deleteDeadline = async (deadlineId: number) => {
-    if (!confirm('Bạn có chắc chắn muốn xoá deadline này?')) return
+    if (!confirm('Do you want to delete this deadline?')) return
 
     try {
         await axios.delete(`/api/deadlines/${deadlineId}`)
@@ -461,10 +461,10 @@ const deleteDeadline = async (deadlineId: number) => {
             deadlines.value.splice(index, 1)
         }
 
-        success('Xoá deadline thành công!')
+        success('Delete deadline successfully!')
     } catch (err) {
         console.error(err)
-        error('Có lỗi xảy ra khi xoá deadline.')
+        error('Error occurred on deleting deadline!')
     } finally {
         activeOverflowMenu.value = null
     }

@@ -82,7 +82,7 @@ class NoteController extends Controller
 
                     $note->attachments()->create([
                         'note_id' => $note->id,
-                        'file_path'  => $path,
+                        'file_path'  => Storage::url($path),
                         'file_type'  => $file->getClientMimeType(),
                         'file_name'  => $file->getClientOriginalName(),
                     ]);

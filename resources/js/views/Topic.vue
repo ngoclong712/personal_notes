@@ -6,12 +6,12 @@
                 <input
                     type="text"
                     v-model="search"
-                    placeholder="Tìm theo tên..."
+                    placeholder="Fint topic with name..."
                     class="w-full md:w-64 px-3 py-2 rounded border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100"
                 />
                 <button @click="clearSearch"
                         class="px-3 py-2 rounded border border-gray-200 dark:border-gray-700 text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800">
-                    Xóa
+                    Reset
                 </button>
             </div>
             <div>
@@ -110,13 +110,13 @@
                 </div>
                 <div class="p-4 space-y-4">
                     <div class="text-sm text-gray-700 dark:text-gray-300">
-                        Chọn file CSV/XLSX với cột: <code class="bg-gray-100 dark:bg-gray-800 px-1 rounded">name</code>,
+                        Select CSV/XLSX file with columns: <code class="bg-gray-100 dark:bg-gray-800 px-1 rounded">name</code>,
                         <code class="bg-gray-100 dark:bg-gray-800 px-1 rounded">description</code>
                     </div>
                     <div class=" justify-between flex items-center gap-2">
                         <button type="button" class="px-3 py-2 rounded-md bg-amber-500 hover:bg-amber-600 text-white"
                                 @click="downloadSampleCsv">
-                            Xem mẫu CSV
+                            View CSV sample
                         </button>
                         <span v-if="selectedFileName"
                               class="text-sm text-gray-600 dark:text-gray-300 truncate">{{ selectedFileName }}</span>
@@ -130,19 +130,19 @@
                         <button type="button"
                                 class="px-3 py-2 rounded-md bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200 border border-gray-200 dark:border-gray-700 hover:bg-gray-200 dark:hover:bg-gray-700"
                                 @click="triggerFilePicker">
-                            Chọn file
+                            Choose file
                         </button>
                     </div>
                     <div v-if="importResult"
                          class="text-sm bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded p-3 text-gray-800 dark:text-gray-100">
-                        <div class="mb-1">Kết quả:</div>
+                        <div class="mb-1">Result:</div>
                         <ul class="list-disc pl-5 space-y-0.5">
-                            <li>Tạo mới: {{ importResult.created }}</li>
-                            <li>Cập nhật: {{ importResult.updated }}</li>
-                            <li>Bỏ qua: {{ importResult.skipped }}</li>
+                            <li>Create new: {{ importResult.created }}</li>
+                            <li>Update: {{ importResult.updated }}</li>
+                            <li>Skip: {{ importResult.skipped }}</li>
                         </ul>
                         <div v-if="importResult.errors?.length" class="mt-2">
-                            <div class="font-medium">Lỗi:</div>
+                            <div class="font-medium">Error:</div>
                             <ul class="list-disc pl-5 space-y-0.5">
                                 <li v-for="(err, idx) in importResult.errors" :key="idx">{{ err }}</li>
                             </ul>
@@ -153,12 +153,12 @@
                     class="flex items-center justify-end gap-2 px-4 py-3 border-t border-gray-200 dark:border-gray-800">
                     <button type="button"
                             class="px-3 py-2 rounded-md border border-gray-200 dark:border-gray-700 text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800"
-                            @click="closeImportModal">Hủy
+                            @click="closeImportModal">Cancel
                     </button>
                     <button type="button"
                             class="px-3 py-2 rounded-md bg-green-600 hover:bg-green-700 disabled:opacity-60 disabled:cursor-not-allowed text-white"
                             :disabled="!selectedFile || importing" @click="doImport">
-                        <span v-if="importing">Đang import...</span>
+                        <span v-if="importing">Importing...</span>
                         <span v-else>Import</span>
                     </button>
                 </div>
@@ -253,7 +253,7 @@ function onFileChange(e: Event) {
         'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
     ]
     if (!allowed.includes(file.type) && !/\.(csv|xlsx)$/i.test(file.name)) {
-        alert('Vui lòng chọn file .csv hoặc .xlsx')
+        alert('Please select .csv or .xlsx file')
         input.value = ''
         return
     }
@@ -284,26 +284,13 @@ async function doImport() {
         })
         importResult.value = res.data?.data || null
         await reloadTopics()
-        success('Import thành công')
+        success('Import successfully!')
     } catch (err: any) {
         console.error(err)
-        alert(err?.response?.data?.message || 'Import thất bại')
+        alert(err?.response?.data?.message || 'Import error.')
     } finally {
         importing.value = false
     }
-}
-
-function toggleSort(column: 'id' | 'name') {
-    if (sortBy.value === column) {
-        sortDir.value = sortDir.value === 'asc' ? 'desc' : 'asc'
-    } else {
-        sortBy.value = column
-        sortDir.value = 'asc'
-    }
-}
-
-function applySearch() {
-    // instant via computed
 }
 
 function clearSearch() {
@@ -319,6 +306,7 @@ async function reloadTopics() {
 }
 
 async function onDelete(id: number) {
+    if (!confirm('Do you want to delete this topic?')) return
     try {
         await axios.delete(`/api/topics/${id}`)
         topics.value = topics.value.filter(t => t.id !== id)

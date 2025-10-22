@@ -34,6 +34,7 @@ type Deadline = {
 
 // Sample data
 const deadline = ref<Deadline[]>([])
+
 // ===== Helpers =====
 const getPriorityClass = (priority: number) => {
     const classes: Record<number, string> = {
@@ -46,9 +47,9 @@ const getPriorityClass = (priority: number) => {
 
 const getPriorityText = (priority: number) => {
     const texts: Record<number, string> = {
-        1: 'Thấp',
-        2: 'Trung bình',
-        3: 'Cao',
+        1: 'Low',
+        2: 'Medium',
+        3: 'High',
     }
     return texts[priority] || texts[1]
 }
@@ -65,18 +66,18 @@ const getStatusClass = (status: number) => {
 
 const getStatusText = (status: number) => {
     const texts: Record<number, string> = {
-        1: 'Đang thực hiện',
-        2: 'Đã hoàn thành',
-        3: 'Đã huỷ',
-        4: 'Quá hạn',
+        1: 'In Progress',
+        2: 'Completed',
+        3: 'Cancelled',
+        4: 'Overdue',
     }
     return texts[status] || texts[1]
 }
 
-// ===== Tính progress =====
+// ===== Progress Calculation =====
 const progress = computed(() => {
     if (!deadline.value || !deadline.value.subtasks) return 0
-    const validSubtasks = deadline.value.subtasks.filter((s: any) => s.status !== 3) // loại subtask bị huỷ
+    const validSubtasks = deadline.value.subtasks.filter((s: any) => s.status !== 3) // exclude cancelled
     const total = validSubtasks.length
     if (total === 0) return 0
     const done = validSubtasks.filter((s: any) => s.status === 2).length
@@ -90,7 +91,7 @@ onMounted(async () => {
         const res = await axios.get(`/api/deadlines/${id}`)
         deadline.value = res.data.data
     } catch (err) {
-        console.error('Lỗi khi tải dữ liệu deadline:', err)
+        console.error('Error while fetching deadline data:', err)
     } finally {
         loading.value = false
     }
@@ -99,7 +100,7 @@ onMounted(async () => {
 
 <template>
     <div class="max-w-4xl mx-auto py-8">
-        <div v-if="loading" class="text-center text-gray-500">Đang tải dữ liệu...</div>
+        <div v-if="loading" class="text-center text-gray-500">Loading data...</div>
 
         <div
             v-else-if="deadline"
@@ -109,57 +110,57 @@ onMounted(async () => {
             <div class="flex items-center justify-between">
                 <h2 class="text-2xl font-semibold text-gray-800">{{ deadline.title }}</h2>
                 <div class="flex space-x-2">
-          <span
-              class="px-3 py-1 text-sm font-medium rounded-full"
-              :class="getPriorityClass(deadline.priority)"
-          >
-            <Flag class="inline w-4 h-4 mr-1" /> {{ getPriorityText(deadline.priority) }}
-          </span>
+                    <span
+                        class="px-3 py-1 text-sm font-medium rounded-full"
+                        :class="getPriorityClass(deadline.priority)"
+                    >
+                        <Flag class="inline w-4 h-4 mr-1" /> {{ getPriorityText(deadline.priority) }}
+                    </span>
                     <span
                         class="px-3 py-1 text-sm font-medium rounded-full"
                         :class="getStatusClass(deadline.status)"
                     >
-            <Clock class="inline w-4 h-4 mr-1" /> {{ getStatusText(deadline.status) }}
-          </span>
+                        <Clock class="inline w-4 h-4 mr-1" /> {{ getStatusText(deadline.status) }}
+                    </span>
                 </div>
             </div>
 
-            <!-- Thông tin chung -->
+            <!-- General Info -->
             <div class="grid grid-cols-2 md:grid-cols-3 gap-4 text-sm text-gray-700">
                 <div class="flex items-center space-x-2">
                     <Tag class="w-4 h-4 text-gray-500" />
-                    <span>Chủ đề: <b>{{ deadline.topic?.name || '—' }}</b></span>
+                    <span>Topic: <b>{{ deadline.topic?.name || '—' }}</b></span>
                 </div>
                 <div class="flex items-center space-x-2">
                     <CalendarDays class="w-4 h-4 text-gray-500" />
-                    <span>Hạn gần nhất: <b>{{ deadline.subtasks_min_due_date || '—' }}</b></span>
+                    <span>Nearest Due Date: <b>{{ deadline.subtasks_min_due_date || '—' }}</b></span>
                 </div>
                 <div class="flex items-center space-x-2">
                     <ListChecks class="w-4 h-4 text-gray-500" />
-                    <span>Tiến độ: <b>{{ progress }}%</b></span>
+                    <span>Progress: <b>{{ progress }}%</b></span>
                 </div>
                 <div class="flex items-center space-x-2">
                     <Clock class="w-4 h-4 text-gray-500" />
-                    <span>Ngày tạo: <b>{{ deadline.created_at?.slice(0, 10) }}</b></span>
+                    <span>Created: <b>{{ deadline.created_at?.slice(0, 10) }}</b></span>
                 </div>
                 <div class="flex items-center space-x-2">
                     <Clock class="w-4 h-4 text-gray-500" />
-                    <span>Cập nhật: <b>{{ deadline.updated_at?.slice(0, 10) }}</b></span>
+                    <span>Updated: <b>{{ deadline.updated_at?.slice(0, 10) }}</b></span>
                 </div>
             </div>
 
-            <!-- Mô tả -->
+            <!-- Description -->
             <div class="bg-gray-50 p-4 rounded-lg border border-gray-200">
                 <div class="flex items-center space-x-2 mb-2 text-gray-700 font-medium">
-                    <FileText class="w-4 h-4 text-gray-500" /> <span>Mô tả</span>
+                    <FileText class="w-4 h-4 text-gray-500" /> <span>Description</span>
                 </div>
-                <p class="text-gray-700 whitespace-pre-line">{{ deadline.description || 'Không có mô tả' }}</p>
+                <p class="text-gray-700 whitespace-pre-line">{{ deadline.description || 'No description available' }}</p>
             </div>
 
-            <!-- Progress bar -->
+            <!-- Progress Bar -->
             <div v-if="deadline.status !== 3" class="space-y-2">
                 <div class="flex justify-between text-sm text-gray-600">
-                    <span>Tiến độ hoàn thành</span>
+                    <span>Completion Progress</span>
                     <span>{{ progress }}%</span>
                 </div>
                 <div class="w-full bg-gray-200 rounded-full h-3 overflow-hidden">
@@ -169,18 +170,18 @@ onMounted(async () => {
                             'bg-blue-500': deadline.status === 1,
                             'bg-green-500': deadline.status === 2,
                             'bg-red-500': deadline.status === 4,
-                          }"
+                        }"
                         :style="{ width: progress + '%' }"
                     ></div>
                 </div>
             </div>
             <div v-else class="text-gray-500 italic text-sm">
-                Công việc đã bị huỷ — không có tiến độ.
+                This task has been cancelled — no progress available.
             </div>
 
             <!-- Subtasks -->
             <div class="space-y-3">
-                <h3 class="text-lg font-semibold text-gray-800">Các công việc con</h3>
+                <h3 class="text-lg font-semibold text-gray-800">Subtasks</h3>
                 <ul class="space-y-2">
                     <li
                         v-for="subtask in deadline.subtasks"
@@ -193,16 +194,16 @@ onMounted(async () => {
                                 class="px-3 py-1 text-xs rounded-full"
                                 :class="getStatusClass(subtask.status)"
                             >
-                {{ getStatusText(subtask.status) }}
-              </span>
+                                {{ getStatusText(subtask.status) }}
+                            </span>
                         </div>
                         <p class="text-sm text-gray-600 mt-1">{{ subtask.content || '—' }}</p>
-                        <p class="text-xs text-gray-500 mt-1">Hạn: {{ subtask.due_date || '—' }}</p>
+                        <p class="text-xs text-gray-500 mt-1">Due: {{ subtask.due_date || '—' }}</p>
                     </li>
                 </ul>
             </div>
         </div>
 
-        <div v-else class="text-center text-gray-500">Không tìm thấy deadline.</div>
+        <div v-else class="text-center text-gray-500">No deadline found.</div>
     </div>
 </template>

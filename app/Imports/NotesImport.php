@@ -33,7 +33,6 @@ class NotesImport implements ToCollection, WithHeadingRow, SkipsEmptyRows
             $status   = $row['status'] ?? null;
             $content  = $row['content'] ?? null;
 
-            // --- validate ---
             if ($title === '') {
                 $this->summary['skipped']++;
                 $this->summary['errors'][] = "Dòng {$rowNumber}: Thiếu cột 'title'";
